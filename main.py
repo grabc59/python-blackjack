@@ -44,10 +44,12 @@ class Hand:
 
 class Player:
     # Player class
-    def __init__(self, player_type):
+    def __init__(self, player_type, deck):
         self.bank = 100
         self.hand = []
         self.player_type = player_type
+        # deal 2 cards to each player
+        self.hit(deck, 2)
 
     # hit function
     def hit(self, deck, qty):
@@ -69,24 +71,20 @@ class Player:
 our_deck = Deck()
 
 # create players
-dealer = Player("dealer")
-player1 = Player("human")
+dealer = Player("dealer", our_deck)
+player1 = Player("human", our_deck)
 player_list = [dealer, player1]
-
-# deal 2 cards to each player
-dealer.hit(our_deck, 2)
-player1.hit(our_deck, 2)
 
 print('Let\'s play Blackjack')
 
 # run the game until an end condition is met
 while True:
 
-    for player in player_list:
-        player.hit(our_deck, 2)
-        print(player.hand)
     # prompt players for input, they can hit (get another card) or stay (take no more cards)
 
     # place bets
+
+    for player in player_list:
+        print(player.hand)
 
     break
