@@ -67,12 +67,24 @@ class Player:
     # track each players money
 
 
+class Game:
+    # Game class. A place for miscellaneous methods related to the game.
+    def __init__(self):
+        self.deck = Deck()
+
+    def print_player_hands(self, player_list):
+        for player in player_list:
+            print(f'{player.name}: {player.hand}')
+
+
+this_game = Game()
+
 # create a deck
-our_deck = Deck()
+# our_deck = Deck()
 
 # create players
-dealer = Player("dealer", our_deck)
-player1 = Player("human", our_deck)
+dealer = Player("dealer", this_game.deck)
+player1 = Player("human", this_game.deck)
 player_list = [dealer, player1]
 
 print('~~ Let\'s play Blackjack')
@@ -81,30 +93,37 @@ print('~~ Closest to 21 wins. Ace is 1 or 11.')
 # run the game until an end condition is met
 while True:
 
-    for player in player_list:
-        print(f'{player.name}: {player.hand}')
+    this_game.print_player_hands(player_list)
 
     for player in player_list:
 
         # say whose turn it is
         print(f'~~ {player.name}\'s turn')
 
-        # prompt players for input, they can hit (get another card) or stay (take no more cards)
-        player_choice = input('Stay (s) / Hit (h)')
-
         # player_choice logic
-        if player_choice == 's':
-            # stay
-            # move on to next player
-            continue
-        elif player_choice == 'h':
-            # hit
-            # add a card to this player's hand
-            player.hit(our_deck, 1)
-        else:
-            # unrecognized input
-            print(
-                f'~~ What was that? "{player_choice}?" Press "s" if you want to stay and not take any more cards. Press "h" if you want another card.')
+
+        # a way to check if the user's hit/stay input is valid
+        valid_move_choice = False
+
+        while valid_move_choice == False:
+
+            # prompt players for input, they can hit (get another card) or stay (take no more cards)
+            player_move_choice = input('Stay (s) / Hit (h)')
+
+            if player_move_choice == 's':
+                # stay
+                # move on to next player
+                valid_move_choice = True
+            elif player_move_choice == 'h':
+                # hit
+                # add a card to this player's hand
+                print(valid_move_choice, player_move_choice, player.name)
+                valid_move_choice = True
+                player.hit(this_game.deck, 1)
+            else:
+                # unrecognized input
+                print(
+                    f'~~ What was that? "{player_move_choice}?" Press "s" if you want to stay and not take any more cards. Press "h" if you want another card.')
 
     # place bets
 
