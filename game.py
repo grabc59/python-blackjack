@@ -1,0 +1,148 @@
+from player import Player
+from deck import Deck
+
+
+class Game:
+    # Game class. A place for methods related to the game.
+    def __init__(self):
+        self.player_list = []
+
+    # return a list of player names
+    def get_player_names(self, player_list):
+        player_names = []
+        for player in player_list:
+            player_names.append(player.name)
+        return player_names
+
+    # get user input on who's playing
+    def populate_players(self):
+        while True:
+            if len(self.player_list) == 0:
+                # if there are no players yet...
+                new_player_name = input(
+                    f'~~ Who\'s in? (type one player at a time) ')
+            else:
+                # to add more players...
+                new_player_name = input(f'~~ Anyone else? [no] ')
+
+            if len(new_player_name) == 0:
+                # exit player input prompt
+                break
+            else:
+                # add the entered player name to the player list
+                new_player = Player(new_player_name)
+                self.player_list.append(new_player)
+            print('players: ', self.get_player_names(self.player_list))
+
+        # add the dealer last
+        dealer = Player("dealer")
+        self.player_list.append(dealer)
+
+    def print_player_hands(self):
+        for player in self.player_list:
+            print(
+                f'{player.name} (${player.bank}) [{player.hand.bet_amount}]: {player.hand.cards} --> {player.hand.total}')
+
+    def bets_loop(self):
+        for player in self.player_list:
+            # loop until the player enters a valid bet amount
+            while True:
+                # prompt for input for bet amount
+                bet_input = input(f'{player.name}\'s bet: ')
+                try:
+                    # check if input is a number
+                    bet_input = int(bet_input)
+                except ValueError:
+                    # return error if input was not a number
+                    print('Error - enter an integer amount to bet')
+                    continue
+                else:
+                    if bet_input <= 0:
+                        print('Bet value must be greater than 0.')
+                    else:
+                        # if input was good, attempt to place bet
+                        if player.place_bet(bet_input):
+                            break
+                        else:
+                            print('Error - insufficient funds')
+            self.print_player_hands()
+        print('~~~~~~~~~~ End of bets loop ~~~~~~~~~~')
+
+    def print_instructions(self):
+        print('~~ Let\'s play Blackjack')
+        print('~~ Closest to 21 wins. Ace is 1 or 11.')
+
+    # deal two cards to each player
+    def deal_loop(self):
+        for player in self.player_list:
+            player.hit(self.deck, 2)
+        print('~~~~~~~~~~ End of deal loop ~~~~~~~~~~')
+
+    def start_round(self):
+        # prepare a new deck for the new round
+        self.deck = Deck()
+        # prepare a new blank hand for each player in the new round
+        for player in self.player_list:
+            player.new_hand()
+        print('~~~~~~~~~~ new round ready ~~~~~~~~~~')
+
+    def hit_or_stay_loop(self):
+        for player in self.player_list:
+            # say whose turn it is
+            print(f'~~ {player.name}\'s turn')
+            # player can hit or stay
+            # check if the user's hit/stay input is valid
+            self.print_player_hands()
+            while True:
+                # prompt players for input, they can hit (get another card) or stay (take no more cards)
+                player_move_choice = input('Stay (s) / Hit (h) ')
+                if player_move_choice == 's':
+                    # stay
+                    # move on to next player
+                    break
+                elif player_move_choice == 'h':
+                    # hit
+                    # add a card to this player's hand and move on to the next player
+                    player.hit(self.deck)
+                    break
+                else:
+                    # unrecognized input
+                    print(
+                        f'~~ What was that? "{player_move_choice}?" Press "s" if you want to stay and not take any more cards. Press "h" if you want another card.')
+            self.print_player_hands()
+        print('~~~~~~~~~~ End of hit/stay loop ~~~~~~~~~~')
+
+    def check_hand_totals(self):
+        leading_score = 0
+        leading_player = ''
+        for player in self.player_list:
+            if player.hand.total > 21:
+                print(f'{player.name} busts!')
+            elif player.hand.total == 21:
+                print(f'{player.name} got blackjack!')
+            if player.hand.total > leading_score:
+                leading_score = player.hand.total
+                leading_player = player.name
+                print(f'{leading_player} is in the lead with {leading_score}')
+
+    def start(self):
+        # main game loop
+        self.print_instructions()
+        # prompt for player names
+        self.populate_players()
+        # loop until an end condition is met
+        while True:
+            # set hands to bets to blank values to clear any previous rounds
+            self.start_round()
+            self.deal_loop()
+            # calculate the player hand total
+            self.print_player_hands()
+            # loop through players to place bets
+            self.bets_loop()
+            # loop through players to hit or stay
+            self.hit_or_stay_loop()
+            # check results of the round
+            self.check_hand_totals()
+            # player turns ends here
+            break
+        print('~~~~~~~~~~ End of round ~~~~~~~~~~')
