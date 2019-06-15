@@ -30,7 +30,9 @@ class Deck:
         cards_to_deal = []
         for _ in range(qty):
             # pick a random card from the list of cards
-            cards_to_deal.append(random.choice(self.cards))
+            random_card_index = random.randint(0, len(self.cards)-1)
+            random_card = self.cards.pop(random_card_index)
+            cards_to_deal.append(random_card)
         return cards_to_deal
 
 
@@ -41,6 +43,9 @@ class Hand:
         self.busted = False
         self.cards = []
         self.bet_amount = 0
+
+    def set_bet(self, bet_amount):
+        self.bet_amount = bet_amount
 
 
 class Player:
@@ -55,20 +60,19 @@ class Player:
 
     # hit function
     def hit(self, deck, qty=1):
-        # add a card to the hand, call deck.deal
+        # add a card to the hand
         cards_delt = deck.deal(qty)
-        for i in cards_delt:
-            self.hand.cards.append(i)
-
-    # stand function
-    def stand(self):
-        pass
+        self.hand.cards.extend(cards_delt)
 
     # bet function
-    def bet(self):
-        pass
-
-    # track each players money
+    def place_bet(self, bet_input):
+        new_bank_balance = self.bank - bet_input
+        if new_bank_balance >= 0:
+            self.bank = new_bank_balance
+            self.hand.set_bet(bet_input)
+            return True
+        else:
+            return False
 
 
 class Game:
@@ -122,17 +126,27 @@ class Game:
                     # check if input is a number
                     bet_input = int(bet_input)
                 except ValueError:
+                    # return error if input was not a number
                     print('Error - enter an integer amount to bet')
                     continue
                 else:
-                    new_bank_balance = player.bank - bet_input
-                    if new_bank_balance >= 0:
-                        player.bank = new_bank_balance
-                        player.hand.bet_amount = bet_input
-                        break
+                    if bet_input <= 0:
+                        print('Bet value must be greater than 0.')
                     else:
-                        print('Error - insufficient funds')
-                        continue
+                        # if input was good, attempt to place bet
+                        if player.place_bet(bet_input):
+                            break
+                        else:
+                            print('Error - insufficient funds')
+                        #     continue
+                        # new_bank_balance = player.bank - bet_input
+                        # if new_bank_balance >= 0:
+                        #     player.bank = new_bank_balance
+                        #     player.hand.bet_amount = bet_input
+                        #     break
+                        # else:
+                        #     print('Error - insufficient funds')
+                        #     continue
             self.print_player_hands()
         print('~~~~~~~~~~ End of bets loop ~~~~~~~~~~')
 
@@ -183,6 +197,7 @@ class Game:
     def start(self):
         # main game loop
         self.print_instructions()
+        # prompt for player names
         self.populate_players()
         # loop until an end condition is met
         while True:
@@ -191,7 +206,7 @@ class Game:
             self.deal_loop()
             # calculate the player hand total
             self.print_player_hands()
-            # place bets
+            # loop through players to place bets
             self.bets_loop()
             # loop through players to hit or stay
             self.hit_or_stay_loop()
@@ -199,10 +214,19 @@ class Game:
             break
         print('~~~~~~~~~~ End of round ~~~~~~~~~~')
 
-# TODO: automated dealer logic
-#   - automate hit vs stay
-#   - skip bet
-#   - 1 card face down
+# TODO:
+# deck
+#   [x] remove delt cards from the deck
+# automated dealer logic
+#   [ ] automate hit vs stay
+#   [ ] skip bet
+#   [ ] 1 card face down
+# end conditions
+#   [ ] calculate player hand values
+#   [ ] win = highest hand <= 21
+#   [ ] multiple players can win if tied
+#   [ ] lose = over 21 or lower than the highest hand that is <= 21
+#   [ ] highest hand = win
 
 
 this_game = Game()
