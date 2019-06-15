@@ -47,6 +47,27 @@ class Hand:
     def set_bet(self, bet_amount):
         self.bet_amount = bet_amount
 
+    def calculate_total(self):
+        # pass
+        # number of aces in this hand. Aces will be processed last, after the subtotal is calculated so that we can determine if the value should be 1 or 11.
+        aces = 0
+        # subtotal of non-ace cards
+        subtotal = 0
+        for i in self.cards:
+            card_value = i[1]
+            if card_value == 'J' or card_value == 'Q' or card_value == 'K':
+                subtotal += 10
+            elif card_value == 'A':
+                # save aces for calculation after the subtotal is known
+                aces += 1
+            else:
+                subtotal += card_value
+
+        if (aces * 11) + subtotal <= 21:
+            self.total = (aces * 11) + subtotal
+        else:
+            self.total = (aces * 1) + subtotal
+
 
 class Player:
     # Player class
@@ -63,6 +84,7 @@ class Player:
         # add a card to the hand
         cards_delt = deck.deal(qty)
         self.hand.cards.extend(cards_delt)
+        self.hand.calculate_total()
 
     # bet function
     def place_bet(self, bet_input):
@@ -114,7 +136,7 @@ class Game:
     def print_player_hands(self):
         for player in self.player_list:
             print(
-                f'{player.name} (${player.bank}) [{player.hand.bet_amount}]: {player.hand.cards}')
+                f'{player.name} (${player.bank}) [{player.hand.bet_amount}]: {player.hand.cards} --> {player.hand.total}')
 
     def bets_loop(self):
         for player in self.player_list:
@@ -138,15 +160,6 @@ class Game:
                             break
                         else:
                             print('Error - insufficient funds')
-                        #     continue
-                        # new_bank_balance = player.bank - bet_input
-                        # if new_bank_balance >= 0:
-                        #     player.bank = new_bank_balance
-                        #     player.hand.bet_amount = bet_input
-                        #     break
-                        # else:
-                        #     print('Error - insufficient funds')
-                        #     continue
             self.print_player_hands()
         print('~~~~~~~~~~ End of bets loop ~~~~~~~~~~')
 
@@ -174,7 +187,7 @@ class Game:
             print(f'~~ {player.name}\'s turn')
             # player can hit or stay
             # check if the user's hit/stay input is valid
-            print(player.hand.cards)
+            self.print_player_hands()
             while True:
                 # prompt players for input, they can hit (get another card) or stay (take no more cards)
                 player_move_choice = input('Stay (s) / Hit (h) ')
