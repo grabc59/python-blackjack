@@ -4,9 +4,14 @@ class Hand:
         self.total = 0
         self.cards = []
         self.bet_amount = 0
+        self.status = "standing"
+        self.payout_multiplier = 1
 
     def set_bet(self, bet_amount):
         self.bet_amount = bet_amount
+
+    def set_status(self, status):
+        self.status = status
 
     def calculate_total(self):
         # pass
@@ -26,10 +31,10 @@ class Hand:
                 subtotal += card_value
 
         # decide each ace value in this hand
-        for ace in range(aces):
-            if (ace * 11) + subtotal <= 21:
-                ace_total = (ace * 11) + subtotal
+        for _ in range(aces):
+            if 11 + subtotal <= 21:
+                ace_total += 11
             else:
-                ace_total = (ace * 1) + subtotal
+                ace_total += 1
 
         self.total = ace_total + subtotal
