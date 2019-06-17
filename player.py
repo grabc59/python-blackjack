@@ -13,6 +13,10 @@ class Player:
         # reset player hand values
         self.hand = Hand()
 
+    # def stand(self):
+    #     print(f'~~~~~~~~~~ {self.name} stands ~~~~~~~~~~')
+    #     time.sleep(1.5)
+
     # hit function
     def hit(self, deck, qty=1):
         # add a card to the hand
@@ -23,12 +27,12 @@ class Player:
 
     def check_hand_total(self):
         if self.hand.total > 21:
-            print(f'{self.name} busts!')
+            print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
             time.sleep(2)
             # bust
             self.hand.set_status("busted")
         elif self.hand.total == 21:
-            print(f'{self.name} got blackjack!')
+            print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
             time.sleep(1)
             self.hand.set_status("blackjack")
             time.sleep(2)

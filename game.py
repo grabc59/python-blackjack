@@ -78,6 +78,7 @@ class Game:
 
     # deal two cards to each player
     def deal_loop(self):
+        print('~~~~~~~~~~ Dealing ~~~~~~~~~~')
         for player in self.player_list:
             if player.type == "dealer":
                 # deal only one card to the dealer (equivalent of the typical face down card)
@@ -103,13 +104,17 @@ class Game:
             if player.type == "dealer":
                 # reveal the dealer's 'face down' card by dealing a card
                 player.hit(self.deck)
+                print(f'~~~~~~~~~~ {player.name} hits ~~~~~~~~~~')
+                time.sleep(1.5)
                 self.print_player_hands()
                 time.sleep(self.pause_time)
                 # dealer must hit up to at least 16
-                while player.hand.total < 16:
+                while player.hand.total <= 16:
                     player.hit(self.deck)
                     self.print_player_hands()
                     time.sleep(self.pause_time)
+                print(f'~~~~~~~~~~ {player.name} stands ~~~~~~~~~~')
+                time.sleep(1.5)
             else:
                 # player can hit or stand
                 # check if the user's hit/stand input is valid
@@ -120,10 +125,14 @@ class Game:
                     if player_move_choice == 's':
                         # stand
                         # move on to next player
+                        print(f'~~~~~~~~~~ {player.name} stands ~~~~~~~~~~')
+                        time.sleep(1.5)
                         break
                     elif player_move_choice == 'h':
                         # hit
                         # add a card to this player's hand
+                        print(f'~~~~~~~~~~ {player.name} hits ~~~~~~~~~~')
+                        time.sleep(1.5)
                         player.hit(self.deck)
                         self.print_player_hands()
                     else:
@@ -135,29 +144,39 @@ class Game:
         print('~~~~~~~~~~ End of hit/stand loop ~~~~~~~~~~')
 
     def make_payouts(self):
+        # identify the dealer so we can compare player hands against the dealer and determine who wins
+        # dealer is always the last player in the list
         dealer = self.player_list[-1]
         for player in self.player_list:
             # no need to compare the dealer to itself
             if player.type != "dealer":
-                if dealer.hand.status == "busted":
-                    # payout will be double the bet to each player still standing if the dealer is busted
-                    if player.hand.status == "standing":
-                        player.hand.payout_multiplier = 2
-                elif dealer.hand.status == "standing" and player.hand.status == "standing":
-                    if player.hand.total > dealer.hand.total:
-                        # player wins double their bet
-                        player.hand.payout_multiplier = 2
-                    elif player.hand.total == dealer.hand.total:
-                        # player keeps their bet amount in a tie with the dealer
-                        pass
-                    else:
-                        # otherwise, the player must have a lower total than the dealer. They lose their bet
-                        player.hand.payout_multiplier = 0
-                # player loses their bet if they busted, no matter what
                 if player.hand.status == "busted":
-                    player.hand.multiplyer = 0
-            player.bank += (player.hand.payout_multiplier *
-                            player.hand.bet_amount)
+                    player.hand.payout_multiplier = 0
+                elif player.hand.status == "standing":
+                    if dealer.hand.status == "standing":
+                        if player.hand.total > dealer.hand.total:
+                            player.hand.status = "beats dealer"
+                            player.hand.payout_multiplier = 2
+                        elif player.hand.total == dealer.hand.total:
+                            player.hand.status = "ties the dealer"
+                        else:
+                            player.hand.status = "loses to dealer"
+                            player.hand.payout_multiplier = 0
+                    elif dealer.hand.status == "busted":
+                        player.hand.status = "beats dealer"
+                        player.hand.payout_multiplier = 2
+                elif player.hand.status == "blackjack":
+                    if dealer.hand.status == "blackjack":
+                        player.hand.status = "ties blackjack with the dealer"
+                        player.hand.payout_multiplier = 1.5
+                    else:
+                        player.hand.payout_multiplier = 2.5
+
+                player.hand.calculate_earnings()
+                player.bank += player.hand.earnings
+                print(
+                    f'~~~~~~~~~~ {player.name} {player.hand.status}, ${player.hand.earnings} ~~~~~~~~~~')
+                time.sleep(self.pause_time)
 
     def start(self):
         # main game loop
@@ -177,6 +196,4 @@ class Game:
             self.hit_or_stand_loop()
             self.make_payouts()
             self.print_player_hands()
-
-            break
         print('~~~~~~~~~~ End of round ~~~~~~~~~~')
