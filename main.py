@@ -9,7 +9,9 @@ from game import Game
 # deck
 #   [x] remove delt cards from the deck
 # automated dealer logic
-#   [ ] skip bet
+#   [ ] skip dealer bet
+#   [ ] dealer doesn't show bet or bank
+#   [ ] consider making the dealer separate from the player_list
 #   [x] automate hit vs stay
 #   [x] 1 card face down
 # end conditions

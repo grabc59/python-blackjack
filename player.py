@@ -1,5 +1,5 @@
 from hand import Hand
-import time
+# import time
 
 
 class Player:
@@ -17,25 +17,25 @@ class Player:
     #     print(f'~~~~~~~~~~ {self.name} stands ~~~~~~~~~~')
     #     time.sleep(1.5)
 
-    # hit function
-    def hit(self, deck, qty=1):
-        # add a card to the hand
-        cards_delt = deck.deal(qty)
-        self.hand.cards.extend(cards_delt)
-        self.hand.calculate_total()
-        self.check_hand_total()
+    # # hit function
+    # def hit(self, deck, qty=1):
+    #     # add a card to the hand
+    #     cards_delt = deck.deal(qty)
+    #     self.hand.cards.extend(cards_delt)
+    #     self.hand.calculate_total()
+    #     self.check_hand_total()
 
-    def check_hand_total(self):
-        if self.hand.total > 21:
-            print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
-            time.sleep(2)
-            # bust
-            self.hand.set_status("busted")
-        elif self.hand.total == 21:
-            print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
-            time.sleep(1)
-            self.hand.set_status("blackjack")
-            time.sleep(2)
+    # def check_hand_total(self):
+    #     if self.hand.total > 21:
+    #         print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
+    #         time.sleep(2)
+    #         # bust
+    #         self.hand.set_status("busted")
+    #     elif self.hand.total == 21:
+    #         print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
+    #         time.sleep(1)
+    #         self.hand.set_status("blackjack")
+    #         time.sleep(2)
 
     def place_bet(self, bet_input):
         new_bank_balance = self.bank - bet_input

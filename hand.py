@@ -14,11 +14,41 @@ class Hand:
             hand_string += f'[{card["value"]}, {card["suit"]}]'
         return hand_string
 
+    # hit function
+    def hit(self, deck, qty=1):
+        # add a card to the hand
+        cards_delt = deck.deal(qty)
+        self.cards.extend(cards_delt)
+        self.calculate_total()
+        # self.set_status()
+
+    # def check_hand_total(self):
+    #     if self.total > 21:
+    #         # print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
+    #         # time.sleep(2)
+    #         # bust
+    #         self.set_status("busted")
+    #     elif self.total == 21:
+    #         # print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
+    #         # time.sleep(1)
+    #         self.set_status("blackjack")
+    #         # time.sleep(2)
+
     def set_bet(self, bet_amount):
         self.bet_amount = bet_amount
 
-    def set_status(self, status):
-        self.status = status
+    # moving this to calculate_total
+    # def set_status(self):
+    #     if self.total > 21:
+    #         # print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
+    #         # time.sleep(2)
+    #         # bust
+    #         self.status = "busted"
+    #     elif self.total == 21:
+    #         # print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
+    #         # time.sleep(1)
+    #         self.status = "blackjack"
+    #         # time.sleep(2)
 
     def calculate_earnings(self):
         self.earnings = self.bet_amount * self.payout_multiplier
@@ -31,7 +61,7 @@ class Hand:
         # subtotal of non-ace cards
         subtotal = 0
         for card in self.cards:
-            print(card)
+            # print(card)
             if card["value"] == 'J' or card["value"] == 'Q' or card["value"] == 'K':
                 subtotal += 10
             elif card["value"] == 'A':
@@ -48,3 +78,14 @@ class Hand:
                 ace_total += 1
 
         self.total = ace_total + subtotal
+
+        if self.total > 21:
+                # print(f'~~~~~~~~~~ {self.name} busts! ~~~~~~~~~~')
+                # time.sleep(2)
+                # bust
+            self.status = "busted"
+        elif self.total == 21:
+            # print(f'~~~~~~~~~~ {self.name} got blackjack! ~~~~~~~~~~')
+            # time.sleep(1)
+            self.status = "blackjack"
+            # time.sleep(2)

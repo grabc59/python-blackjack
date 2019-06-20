@@ -1,13 +1,11 @@
 from player import Player
 from deck import Deck
-import time
 
 
 class Game:
     # Game class. A place for methods related to the game.
     def __init__(self):
         self.player_list = []
-        self.pause_time = 2
 
     # return a list of player names
     def get_player_names(self, player_list):
@@ -22,10 +20,10 @@ class Game:
             if len(self.player_list) == 0:
                 # if there are no players yet...
                 new_player_name = input(
-                    f'~~ Who\'s in? (type one player at a time) ')
+                    f'> Who\'s in? (type one player at a time) ')
             else:
                 # to add more players...
-                new_player_name = input(f'~~ Anyone else playing? [no] ')
+                new_player_name = input(f'> Anyone else playing? [no] ')
 
             if len(new_player_name) == 0:
                 # exit player input prompt
@@ -34,20 +32,26 @@ class Game:
                 # add the entered player name to the player list
                 new_player = Player(new_player_name)
                 self.player_list.append(new_player)
-            print('players: ', self.get_player_names(self.player_list))
+            print('Players:')
+            for player in self.player_list:
+                print(f'-> {player.name}')
 
         # add the dealer last
-        dealer = Player("dealer", "dealer")
+        dealer = Player("Dealer", "dealer")
         self.player_list.append(dealer)
 
     def print_player_hands(self):
         for player in self.player_list:
-            print(
-                f'{player.name} Bank: ${player.bank}, Bet: {player.hand.bet_amount}, Hand: {player.hand.get_hand()}, Total: {player.hand.total}')
+            if player.type == "dealer":
+                print(
+                    f'{player.name} - Hand: {player.hand.get_hand()}, Total: {player.hand.total}')
+            else:
+                print(
+                    f'{player.name} - Bank: ${player.bank}, Bet: ${player.hand.bet_amount}, Hand: {player.hand.get_hand()}, Total: {player.hand.total}')
 
     def bets_loop(self):
         for player in self.player_list:
-            print(f'~~~~~~~~~~ {player.name}\'s turn to bet ~~~~~~~~~~')
+            print(f'> {player.name}\'s turn to bet')
             if player.type != "dealer":
                 # loop until the player enters a valid bet amount
                 while True:
@@ -66,26 +70,28 @@ class Game:
                         else:
                             # if input was good, attempt to place bet
                             if player.place_bet(bet_input):
+                                print(
+                                    f'> {player.name} bets ${bet_input}')
                                 break
                             else:
                                 print('Error - insufficient funds')
                 self.print_player_hands()
-        print('~~~~~~~~~~ End of bets loop ~~~~~~~~~~')
+        print('> End of bets loop')
 
     def print_instructions(self):
-        print('~~ Let\'s play Blackjack')
-        print('~~ Closest to 21 wins. Ace is 1 or 11.')
+        print(u'> Let\'s play Blackjack \u2666\u2660\u2665\u2663')
+        print('> Closest to 21 wins. Ace is 1 or 11.')
 
     # deal two cards to each player
     def deal_loop(self):
-        print('~~~~~~~~~~ Dealing ~~~~~~~~~~')
+        print('> Dealing...')
         for player in self.player_list:
             if player.type == "dealer":
                 # deal only one card to the dealer (equivalent of the typical face down card)
-                player.hit(self.deck)
+                player.hand.hit(self.deck)
             else:
-                player.hit(self.deck, 2)
-        print('~~~~~~~~~~ End of deal loop ~~~~~~~~~~')
+                player.hand.hit(self.deck, 2)
+        print('> End of deal loop')
 
     def start_round(self):
         # prepare a new deck for the new round
@@ -93,28 +99,22 @@ class Game:
         # prepare a new blank hand for each player in the new round
         for player in self.player_list:
             player.new_hand()
-        print('~~~~~~~~~~ new round ready ~~~~~~~~~~')
+        print('> new round ready')
 
     def hit_or_stand_loop(self):
         self.print_player_hands()
         for player in self.player_list:
             # say whose turn it is
             print(
-                f'~~~~~~~~~~ {player.name}\'s turn to hit or stay ~~~~~~~~~~')
+                f'> {player.name}\'s turn to hit or stay')
             if player.type == "dealer":
-                # reveal the dealer's 'face down' card by dealing a card
-                player.hit(self.deck)
-                print(f'~~~~~~~~~~ {player.name} hits ~~~~~~~~~~')
-                time.sleep(1.5)
-                self.print_player_hands()
-                time.sleep(self.pause_time)
-                # dealer must hit up to at least 16
+                # dealer must hit until hand total is > 16
                 while player.hand.total <= 16:
-                    player.hit(self.deck)
+                    player.hand.hit(self.deck)
                     self.print_player_hands()
-                    time.sleep(self.pause_time)
-                print(f'~~~~~~~~~~ {player.name} stands ~~~~~~~~~~')
-                time.sleep(1.5)
+                    input("Press Enter to continue...")
+                print(f'> {player.name} stands')
+                input("Press Enter to continue...")
             else:
                 # player can hit or stand
                 # check if the user's hit/stand input is valid
@@ -125,23 +125,23 @@ class Game:
                     if player_move_choice == 's':
                         # stand
                         # move on to next player
-                        print(f'~~~~~~~~~~ {player.name} stands ~~~~~~~~~~')
-                        time.sleep(1.5)
+                        print(f'> {player.name} stands')
+                        input("Press Enter to continue...")
                         break
                     elif player_move_choice == 'h':
                         # hit
                         # add a card to this player's hand
-                        print(f'~~~~~~~~~~ {player.name} hits ~~~~~~~~~~')
-                        time.sleep(1.5)
-                        player.hit(self.deck)
+                        print(f'> {player.name} hits')
+                        input("Press Enter to continue...")
+                        player.hand.hit(self.deck)
                         self.print_player_hands()
                     else:
                         # unrecognized input
                         print(
-                            f'~~ What was that? "{player_move_choice}?" Press "s" if you want to stand and not take any more cards. Press "h" if you want another card.')
-            print(f'~~~~~~~~~~ End of {player.name}\'s turn ~~~~~~~~~~')
+                            f'> What was that? "{player_move_choice}?" Press "s" if you want to stand and not take any more cards. Press "h" if you want another card.')
+            print(f'> End of {player.name}\'s turn')
             self.print_player_hands()
-        print('~~~~~~~~~~ End of hit/stand loop ~~~~~~~~~~')
+        print('> End of hit/stand loop')
 
     def make_payouts(self):
         # identify the dealer so we can compare player hands against the dealer and determine who wins
@@ -175,8 +175,8 @@ class Game:
                 player.hand.calculate_earnings()
                 player.bank += player.hand.earnings
                 print(
-                    f'~~~~~~~~~~ {player.name} {player.hand.status}, ${player.hand.earnings} ~~~~~~~~~~')
-                time.sleep(self.pause_time)
+                    f'> {player.name} {player.hand.status}, ${player.hand.earnings}')
+                input("Press Enter to continue...")
 
     def start(self):
         # main game loop
@@ -196,4 +196,4 @@ class Game:
             self.hit_or_stand_loop()
             self.make_payouts()
             self.print_player_hands()
-        print('~~~~~~~~~~ End of round ~~~~~~~~~~')
+        print('> End of round')
