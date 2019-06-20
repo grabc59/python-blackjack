@@ -8,6 +8,12 @@ class Hand:
         self.payout_multiplier = 1
         self.earnings = 0
 
+    def get_hand(self):
+        hand_string = ""
+        for card in self.cards:
+            hand_string += f'[{card["value"]}, {card["suit"]}]'
+        return hand_string
+
     def set_bet(self, bet_amount):
         self.bet_amount = bet_amount
 
@@ -24,15 +30,15 @@ class Hand:
         ace_total = 0
         # subtotal of non-ace cards
         subtotal = 0
-        for i in self.cards:
-            card_value = i[1]
-            if card_value == 'J' or card_value == 'Q' or card_value == 'K':
+        for card in self.cards:
+            print(card)
+            if card["value"] == 'J' or card["value"] == 'Q' or card["value"] == 'K':
                 subtotal += 10
-            elif card_value == 'A':
+            elif card["value"] == 'A':
                 # save aces for calculation after the subtotal is known
                 aces += 1
             else:
-                subtotal += card_value
+                subtotal += card["value"]
 
         # decide each ace value in this hand
         for _ in range(aces):

@@ -11,7 +11,9 @@ class Deck:
 
         # these are the possible combinations that make up the deck
         self.card_components = {
-            "suits": ["Diamonds", "Hearts", "Clubs", "Spades"],
+            # "suits": ["Diamonds", "Hearts", "Clubs", "Spades"],
+            #  Diamonds: \u2666, Spades: \u2660, Hearts: \u2665, Clubs: \u2663
+            "suits": [u"\u2666", u"\u2660", u"\u2665", u"\u2663"],
             "values": [2, 3, 4, 5, 6, 7, 8, 9, "J", "Q", "K", "A"]
         }
 
@@ -22,7 +24,7 @@ class Deck:
         self.cards = []
         for i in self.card_components["suits"]:
             for j in self.card_components["values"]:
-                self.cards.append([i, j])
+                self.cards.append({"suit": i, "value": j})
     # return a list of cards to be dealt
 
     def deal(self, qty):

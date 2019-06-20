@@ -43,7 +43,7 @@ class Game:
     def print_player_hands(self):
         for player in self.player_list:
             print(
-                f'{player.name} (${player.bank}) [{player.hand.bet_amount}]: {player.hand.cards} --> {player.hand.total}')
+                f'{player.name} Bank: ${player.bank}, Bet: {player.hand.bet_amount}, Hand: {player.hand.get_hand()}, Total: {player.hand.total}')
 
     def bets_loop(self):
         for player in self.player_list:
